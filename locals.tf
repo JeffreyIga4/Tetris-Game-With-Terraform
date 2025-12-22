@@ -1,0 +1,41 @@
+locals {
+  project_name = "tetris-rg"
+  location     = "northeurope"
+
+  resource_group_name = "${local.project_name}-rg"
+
+  vnet = {
+    name          = "terraformvnet"
+    address_space = ["10.0.0.0/16"]
+  }
+
+  subnet = {
+    name           = "subnet"
+    address_prefix = ["10.0.0.0/20"]
+  }
+
+  nsg = {
+    name = "myNSG"
+  }
+
+  lb = {
+    name          = "myLB"
+    frontend_name = "myPublicIP"
+    sku           = "Standard"
+  }
+
+  vmss = {
+    name      = "vmss-terraform"
+    sku       = "Standard_D2s_v4"
+    instances = 3
+    admin_user = "azureuser"
+  }
+
+  autoscale = {
+    min     = 1
+    max     = 10
+    default = 3
+    scale_out_cpu = 80
+    scale_in_cpu  = 10
+  }
+}

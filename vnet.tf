@@ -2,23 +2,23 @@ resource "random_pet" "lb_hostname" {
 }
 
 resource "azurerm_resource_group" "rg" {
-    name = "tetris-rg"
-    location = "northeurope"
+    name = local.resource_group_name
+    location = local.location
   
 }
 
 resource "azurerm_virtual_network" "test" {
-  name                = "terraformvnet"
-  address_space       = ["10.0.0.0/16"]
+  name                = local.vnet.name
+  address_space       = local.vnet.address_space
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 }
 
 resource "azurerm_subnet" "subnet" {
-  name                 = "subnet"
+  name                 = local.subnet.name
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.test.name
-  address_prefixes     = ["10.0.0.0/20"]
+  address_prefixes     = local.subnet.address_prefix
 }
 
 # network security group for the subnet with a rule to allow http, https and ssh traffic

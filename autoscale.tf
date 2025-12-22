@@ -8,9 +8,9 @@ resource "azurerm_monitor_autoscale_setting" "autoscale" {
   profile {
     name = "autoscale"
     capacity {
-      default = 3
-      minimum = 1
-      maximum = 10
+      default = local.autoscale.default
+      minimum = local.autoscale.min
+      maximum = local.autoscale.max
     }
 
      # SCALE OUT: CPU > 80%
@@ -23,7 +23,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale" {
         time_window        = "PT5M"
         time_aggregation   = "Average"
         operator           = "GreaterThan"
-        threshold          = 80
+        threshold          = local.autoscale.scale_out_cpu
       }
 
       scale_action {
@@ -44,7 +44,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale" {
         time_window        = "PT10M"
         time_aggregation   = "Average"
         operator           = "LessThan"
-        threshold          = 10
+        threshold          = local.autoscale.scale_in_cpu
       }
 
       scale_action {
@@ -64,7 +64,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale" {
         time_window        = "PT10M"
         time_aggregation   = "Average"
         operator           = "LessThan"
-        threshold          = 10
+        threshold          = local.autoscale.scale_in_cpu
       }
 
       scale_action {

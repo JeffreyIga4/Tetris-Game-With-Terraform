@@ -1,10 +1,10 @@
 
 resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tutorial" {
-  name                        = "vmss-terraform"
+  name                        = local.vmss.name
   resource_group_name         = azurerm_resource_group.rg.name
   location                    = azurerm_resource_group.rg.location
-  sku_name                    = "Standard_D2s_v4"
-  instances                   = 3
+  sku_name                    = local.vmss.sku
+  instances                   = local.vmss.instances
   platform_fault_domain_count = 1     # For zonal deployments, this must be set to 1
   zones                       = ["1"] # Zones required to lookup zone in the startup script
 
@@ -14,7 +14,7 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tutori
       disable_password_authentication = true
       admin_username                  = "azureuser"
       admin_ssh_key {
-        username   = "azureuser"
+        username   = local.vmss.admin_user
         public_key = file(".ssh/key.pub")
       }
     }
