@@ -12,5 +12,8 @@ terraform {
 # configures the provider
 
 provider "azurerm" {
-  features {}
+    features {
+      
+    }
+
 }

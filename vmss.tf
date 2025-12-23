@@ -1,4 +1,5 @@
 
+
 resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tutorial" {
   name                        = local.vmss.name
   resource_group_name         = azurerm_resource_group.rg.name
@@ -12,9 +13,9 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss_terraform_tutori
   os_profile {
     linux_configuration {
       disable_password_authentication = true
-      admin_username                  = "azureuser"
+      admin_username                  = local.vmss.admin_user
       admin_ssh_key {
-        username   = local.vmss.admin_user
+        username   =local.vmss.admin_user
         public_key = file(".ssh/key.pub")
       }
     }

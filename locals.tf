@@ -1,6 +1,6 @@
 locals {
-  project_name = "tetris-rg"
-  location     = "northeurope"
+  project_name = "tetris"
+  location     = "canadacentral"
 
   resource_group_name = "${local.project_name}-rg"
 
@@ -26,8 +26,8 @@ locals {
 
   vmss = {
     name      = "vmss-terraform"
-    sku       = "Standard_D2s_v4"
-    instances = 3
+    sku       = "Standard_B2s"
+    instances = 1
     admin_user = "azureuser"
   }
 

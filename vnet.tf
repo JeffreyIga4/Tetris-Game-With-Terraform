@@ -7,12 +7,13 @@ resource "azurerm_resource_group" "rg" {
   
 }
 
+
 resource "azurerm_virtual_network" "test" {
   name                = local.vnet.name
   address_space       = local.vnet.address_space
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-}
+} 
 
 resource "azurerm_subnet" "subnet" {
   name                 = local.subnet.name
@@ -21,69 +22,54 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = local.subnet.address_prefix
 }
 
-# network security group for the subnet with a rule to allow http, https and ssh traffic
 resource "azurerm_network_security_group" "myNSG" {
-  name                = "myNSG"
+  name                = local.nsg.name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
-  # Allow HTTP traffic ONLY from Azure Load Balancer
-  security_rule {
-    name                       = "allow-lb-http"
+  # Allow HTTP only from Azure Load Balancer
+ security_rule {
+    name                       = "allow-http"
     priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "80"
-    source_address_prefix      = "AzureLoadBalancer"
-    destination_address_prefix = "*"
-  }
-
-  # Allow SSH ONLY via Load Balancer NAT rules
-  security_rule {
-    name                       = "allow-lb-ssh"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "AzureLoadBalancer"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 
   security_rule {
-    name                       = "allow-lb-https"
-    priority                   = 120
+    name                       = "allow-https"
+    priority                   = 101
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "443"
-    source_address_prefix      = "AzureLoadBalancer"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-
-  # Deny everything else inbound
+  #ssh security rule
   security_rule {
-    name                       = "deny-all-inbound"
-    priority                   = 4096
+    name                       = "allow-ssh"
+    priority                   = 102
     direction                  = "Inbound"
-    access                     = "Deny"
-    protocol                   = "*"
+    access                     = "Allow"
+    protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "*"
+    destination_port_range     = "22"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 }
 
-
 resource "azurerm_subnet_network_security_group_association" "myNSG" {
   subnet_id                 = azurerm_subnet.subnet.id
   network_security_group_id = azurerm_network_security_group.myNSG.id
 }
+
 
 # A public IP address for the load balancer
 resource "azurerm_public_ip" "example" {
@@ -98,12 +84,12 @@ resource "azurerm_public_ip" "example" {
 
 # A load balancer with a frontend IP configuration and a backend address pool
 resource "azurerm_lb" "example" {
-  name                = "myLB"
+  name                = local.lb.name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  sku                 = "Standard"
+  sku                 = local.lb.sku
   frontend_ip_configuration {
-    name                 = "myPublicIP"
+    name                 = local.lb.frontend_name
     public_ip_address_id = azurerm_public_ip.example.id
   }
 }
@@ -144,7 +130,7 @@ resource "azurerm_lb_nat_rule" "ssh" {
   frontend_port_start            = 50000
   frontend_port_end              = 50119
   backend_port                   = 22
-  frontend_ip_configuration_name = "myPublicIP"
+  frontend_ip_configuration_name = local.lb.frontend_name
   backend_address_pool_id        = azurerm_lb_backend_address_pool.bepool.id
 }
 
@@ -153,7 +139,7 @@ resource "azurerm_public_ip" "natgwpip" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
-  sku                 = "Standard"
+  sku                 = local.lb.sku
   zones               = ["1"]
 }
 
@@ -162,7 +148,7 @@ resource "azurerm_nat_gateway" "example" {
   name                    = "nat-Gateway"
   location                = azurerm_resource_group.rg.location
   resource_group_name     = azurerm_resource_group.rg.name
-  sku_name                = "Standard"
+  sku_name                = local.lb.sku
   idle_timeout_in_minutes = 10
   zones                   = ["1"]
 }
