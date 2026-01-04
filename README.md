@@ -5,6 +5,10 @@ The game runs on a **Virtual Machine Scale Set (VMSS)** behind an **Azure Standa
 
 The application is publicly accessible via the Load Balancer, while backend VM instances remain private.
 
+
+![ADE1D7B8-4ED9-48A9-9E11-E8EA1CFFD3AF_1_201_a](https://github.com/user-attachments/assets/d368a6d4-d73e-4b2b-bf4d-de2e5f7900c1)
+
+
 ## Architecture
 - Azure Virtual Network with backend subnet
 - Network Security Group restricting inbound traffic
